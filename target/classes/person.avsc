@@ -1,0 +1,10 @@
+{
+  "type": "record",
+  "name": "Person",
+  "namespace": "com.example.beam",
+  "fields": [
+    { "name": "id", "type": "long" },
+    { "name": "name_enc", "type": "string" },
+    { "name": "email_enc", "type": "string" }
+  ]
+}
