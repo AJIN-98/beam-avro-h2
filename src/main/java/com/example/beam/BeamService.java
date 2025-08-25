@@ -1,6 +1,7 @@
 package com.example.beam;
 
 import com.example.beam.model.PersonEnc;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.Schema;
 import org.apache.avro.file.DataFileWriter;
 import org.apache.avro.generic.GenericData;
@@ -25,6 +26,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Objects;
 
+@Slf4j
 @Service
 public class BeamService {
 
@@ -67,14 +69,14 @@ public class BeamService {
         try (Connection c = DriverManager.getConnection(jdbcUrl, "sa", "");
              Statement st = c.createStatement()) {
             ResultSet rs = st.executeQuery("SELECT id, name_enc, email_enc FROM people_enc ORDER BY id");
-            System.out.println("\n=== H2 contents (decrypted) ===");
+            log.info("=== H2 contents (decrypted) ===");
             while (rs.next()) {
                 long id = rs.getLong(1);
                 String n = rs.getString(2);
                 String e = rs.getString(3);
                 String name = CryptoUtil.decryptFromB64(n, keyB64);
                 String email = CryptoUtil.decryptFromB64(e, keyB64);
-                System.out.printf("id=%d, name=%s, email=%s%n", id, name, email);
+                log.info("id={}, name={}, email={}", id, name, email);
             }
         }
     }
@@ -94,7 +96,7 @@ public class BeamService {
             write(dfw, schema, 2L, "Bob",   "Bob@Example.com",   keyB64);
             write(dfw, schema, 3L, "Carol", "Carol@Example.com", keyB64);
         }
-        System.out.println("Generated encrypted Avro at: " + outFile.getAbsolutePath());
+        log.info("Generated encrypted Avro at: {}", outFile.getAbsolutePath());
     }
 
     private void write(DataFileWriter<GenericRecord> dfw, Schema schema,
